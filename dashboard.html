@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Eventify</title>
+  
+  <!-- FontAwesome, QRious, ChartJS (for charts), and style rules -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- QR Scanner tiny library - html5-qrcode zero dependency -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/toast.css">
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header id="header-nav"></header>
+
+  <div class="dashboard-layout">
+    
+    <!-- Sidebar Left Navigation Links (Dynamically Injected based on Role) -->
+    <aside class="sidebar" id="dashboard-sidebar">
+      <!-- Injected by Javascript -->
+    </aside>
+
+    <!-- Main Content Panel Area -->
+    <main class="dashboard-main">
+      
+      <!-- Top Greetings & Notifications trigger bar -->
+      <div class="dashboard-header">
+        <div class="dashboard-title">
+          <h2 id="welcome-title">Greetings, User!</h2>
+          <p id="welcome-subtitle">Here is a quick look at your event updates.</p>
+        </div>
+        
+        <!-- Notifications Icon & Profile quick look -->
+        <div style="display: flex; gap: 20px; align-items: center;">
+          <div style="position: relative; cursor: pointer;" onclick="switchTab('notifications')">
+            <i class="fas fa-bell" style="font-size: 20px; color: var(--text-secondary);"></i>
+            <span class="badge badge-cancelled" id="unread-notif-count" style="position: absolute; top: -8px; right: -8px; padding: 2px 6px; font-size: 9px; display: none;">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN TABS CONTAINER -->
+      <div id="tab-panels-content">
+        <!-- RENDERED DYNAMICALLY BY JAVASCRIPT -->
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- DYNAMIC DASHBOARD CRUD MODALS -->
+  
+  <!-- CREATE/EDIT EVENT MODAL -->
+  <div class="modal" id="event-crud-modal">
+    <div class="modal-dialog">
+      <form id="event-crud-form" class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="event-modal-title">Create New Event</h3>
+          <button type="button" class="close-btn" onclick="UI.closeModal('event-crud-modal')">&times;</button>
+        </div>
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <input type="hidden" id="event-edit-id">
+          
+          <div class="form-group">
+            <label class="form-label" for="evt-title">Event Title</label>
+            <input type="text" id="evt-title" class="form-control" required placeholder="eg. World Tech Expo 2026">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="evt-category">Category</label>
+              <select id="evt-category" class="form-control form-select" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="evt-price">Ticket Price (BDT)</label>
+              <input type="number" id="evt-price" class="form-control" min="0" required placeholder="0 for Free">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="evt-location">Venue Location</label>
+            <input type="text" id="evt-location" class="form-control" required placeholder="eg. BICC, Dhaka">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="evt-date">Event Date</label>
+              <input type="date" id="evt-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="evt-time">Time Range</label>
+              <input type="text" id="evt-time" class="form-control" required placeholder="eg. 09:00 AM - 05:00 PM">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="evt-seats">Seat Capacity</label>
+              <input type="number" id="evt-seats" class="form-control" min="1" required placeholder="500">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="evt-status">Event Status</label>
+              <select id="evt-status" class="form-control form-select">
+                <option value="UPCOMING">Upcoming</option>
+                <option value="ONGOING">Ongoing</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="evt-desc">About & Details</label>
+            <textarea id="evt-desc" class="form-control" rows="4" required placeholder="Write a summary about this event..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);">Highlights (JSON Config)</h4>
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; margin-bottom: 10px;">
+              <input type="text" class="form-control" id="evt-highlight-dress" placeholder="Dress Code (eg. Business)">
+              <input type="number" class="form-control" id="evt-highlight-workshops" placeholder="Workshops count">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;">
+              <select class="form-control form-select" id="evt-highlight-wifi">
+                <option value="true">WiFi: Available</option>
+                <option value="false">WiFi: Not Available</option>
+              </select>
+              <input type="text" class="form-control" id="evt-highlight-parking" placeholder="Parking Facility info">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="evt-banner">Event Banner Image</label>
+            <input type="file" id="evt-banner" class="form-control" accept="image/*">
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Leave blank if editing and keeping current image.</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="UI.closeModal('event-crud-modal')">Close</button>
+          <button type="submit" class="btn btn-primary">Save Event</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CREATE/EDIT CATEGORY MODAL -->
+  <div class="modal" id="category-crud-modal">
+    <div class="modal-dialog">
+      <form id="category-crud-form" class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="category-modal-title">Create Event Category</h3>
+          <button type="button" class="close-btn" onclick="UI.closeModal('category-crud-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="cat-edit-id">
+          <div class="form-group">
+            <label class="form-label" for="cat-name">Category Name</label>
+            <input type="text" id="cat-name" class="form-control" required placeholder="eg. Live Music">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cat-slug">Unique Slug</label>
+            <input type="text" id="cat-slug" class="form-control" required placeholder="eg. live-music">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cat-icon">Icon Image (Optional)</label>
+            <input type="file" id="cat-icon" class="form-control" accept="image/*">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="UI.closeModal('category-crud-modal')">Close</button>
+          <button type="submit" class="btn btn-primary">Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CREATE/EDIT MANAGER MODAL -->
+  <div class="modal" id="manager-crud-modal">
+    <div class="modal-dialog">
+      <form id="manager-crud-form" class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="manager-modal-title">Create Manager</h3>
+          <button type="button" class="close-btn" onclick="UI.closeModal('manager-crud-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="mng-edit-id">
+          
+          <div class="form-group">
+            <label class="form-label" for="mng-name">Full Name</label>
+            <input type="text" id="mng-name" class="form-control" required placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="mng-email">Email Address</label>
+            <input type="email" id="mng-email" class="form-control" required placeholder="john@domain.com">
+          </div>
+          <div class="form-group" id="mng-password-wrapper">
+            <label class="form-label" for="mng-password">Password</label>
+            <input type="password" id="mng-password" class="form-control" required placeholder="At least 6 chars">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="mng-phone">Phone Number</label>
+            <input type="text" id="mng-phone" class="form-control" placeholder="+88017...">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="mng-location">Location Address</label>
+            <input type="text" id="mng-location" class="form-control" placeholder="Dhaka, BD">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="mng-avatar">Avatar Photo</label>
+            <input type="file" id="mng-avatar" class="form-control" accept="image/*">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="UI.closeModal('manager-crud-modal')">Close</button>
+          <button type="submit" class="btn btn-primary">Save Manager</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CREATE/EDIT STAFF MODAL -->
+  <div class="modal" id="staff-crud-modal">
+    <div class="modal-dialog">
+      <form id="staff-crud-form" class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="staff-modal-title">Create Staff</h3>
+          <button type="button" class="close-btn" onclick="UI.closeModal('staff-crud-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="staff-edit-id">
+          
+          <div class="form-group">
+            <label class="form-label" for="stf-name">Full Name</label>
+            <input type="text" id="stf-name" class="form-control" required placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="stf-email">Email Address</label>
+            <input type="email" id="stf-email" class="form-control" required placeholder="staff@domain.com">
+          </div>
+          <div class="form-group" id="stf-password-wrapper">
+            <label class="form-label" for="stf-password">Password</label>
+            <input type="password" id="stf-password" class="form-control" required placeholder="At least 6 chars">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="stf-avatar">Avatar Photo</label>
+            <input type="file" id="stf-avatar" class="form-control" accept="image/*">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="UI.closeModal('staff-crud-modal')">Close</button>
+          <button type="submit" class="btn btn-primary">Save Staff</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SEND MANUAL NOTIFICATION MODAL -->
+  <div class="modal" id="notification-dispatch-modal">
+    <div class="modal-dialog">
+      <form id="notification-dispatch-form" class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Dispatch System Notification</h3>
+          <button type="button" class="close-btn" onclick="UI.closeModal('notification-dispatch-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="notif-title">Title</label>
+            <input type="text" id="notif-title" class="form-control" required placeholder="Notification header title">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="notif-message">Message Content</label>
+            <textarea id="notif-message" class="form-control" rows="4" required placeholder="Notification details..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="notif-user-id">Recipient User ID (Optional)</label>
+            <input type="text" id="notif-user-id" class="form-control" placeholder="Leave empty for broad target role">
+          </div>
+          <div class="form-group" id="notif-role-wrapper">
+            <label class="form-label" for="notif-role">Target Role (If User ID is blank)</label>
+            <select id="notif-role" class="form-control form-select">
+              <option value="USER">All Attendees (Users)</option>
+              <option value="STAFF">All Staff Members</option>
+              <option value="MANAGER">All Managers</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="UI.closeModal('notification-dispatch-modal')">Close</button>
+          <button type="submit" class="btn btn-primary">Dispatch</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

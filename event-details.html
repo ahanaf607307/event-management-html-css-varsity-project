@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details | Eventify</title>
+  
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/toast.css">
+  
+  <style>
+    /* Details Hero banner */
+    .details-hero {
+      position: relative;
+      height: 380px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 60px 0;
+      background: var(--bg-secondary);
+    }
+    
+    .details-hero-img {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.3;
+    }
+
+    .details-hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, transparent 30%, var(--bg-primary) 100%);
+      z-index: 1;
+    }
+
+    .details-hero-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 40px;
+      padding: 60px 0;
+    }
+
+    /* Highlight Pills */
+    .highlight-badge-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 30px 0;
+    }
+
+    .highlight-badge-item {
+      padding: 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .highlight-badge-item i {
+      font-size: 20px;
+      color: var(--accent-primary);
+    }
+
+    /* Ticket Box Card sticky right */
+    .ticket-sticky-card {
+      position: sticky;
+      top: 100px;
+      padding: 30px;
+      border-radius: var(--border-radius-md);
+    }
+
+    .ticket-sticky-info {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .ticket-sticky-info-item {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .ticket-sticky-info-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .ticket-sticky-info-item i {
+      font-size: 18px;
+      color: var(--accent-primary);
+      width: 20px;
+      margin-top: 3px;
+    }
+
+    /* Seat counter controls */
+    .seat-counter {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .counter-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Review stars selection styling */
+    .stars-rating-picker {
+      display: flex;
+      gap: 8px;
+      font-size: 24px;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+    .stars-rating-picker i:hover, .stars-rating-picker i.active {
+      color: var(--warning);
+    }
+
+    .review-item {
+      padding: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .review-item:last-child {
+      border-bottom: none;
+    }
+
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .countdown-widget {
+      display: flex;
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .countdown-time-unit {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 8px 12px;
+      border-radius: 6px;
+      text-align: center;
+      min-width: 60px;
+      border: 1px solid var(--glass-border);
+    }
+    .countdown-number {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--accent-pink);
+    }
+    .countdown-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 900px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+      .ticket-sticky-card {
+        position: relative;
+        top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dynamic Header Navigation -->
+  <header id="header-nav"></header>
+
+  <!-- Hero Header Banner -->
+  <section class="details-hero" id="details-banner-sec">
+    <img src="" alt="" class="details-hero-img" id="details-hero-bg">
+    <div class="container">
+      <div class="details-hero-content">
+        <span class="badge badge-upcoming" id="details-category-badge" style="margin-bottom: 15px;">Technology</span>
+        <h1 style="font-size: 40px; margin-bottom: 15px;" id="details-title">Loading Event Details...</h1>
+        <p style="color: var(--text-secondary); display: flex; align-items: center; gap: 15px;">
+          <span><i class="fas fa-calendar-alt" style="color: var(--accent-primary);"></i> <strong id="details-date-lbl">Loading...</strong></span>
+          <span><i class="fas fa-clock" style="color: var(--accent-primary);"></i> <strong id="details-time-lbl">Loading...</strong></span>
+        </p>
+
+        <!-- Countdown timer -->
+        <div class="countdown-widget" id="countdown-block" style="display: none;">
+          <div class="countdown-time-unit"><div class="countdown-number" id="time-days">00</div><div class="countdown-label">Days</div></div>
+          <div class="countdown-time-unit"><div class="countdown-number" id="time-hours">00</div><div class="countdown-label">Hrs</div></div>
+          <div class="countdown-time-unit"><div class="countdown-number" id="time-minutes">00</div><div class="countdown-label">Mins</div></div>
+          <div class="countdown-time-unit"><div class="countdown-number" id="time-seconds">00</div><div class="countdown-label">Secs</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Page Content Grid -->
+  <div class="container">
+    <div class="details-grid">
+      
+      <!-- Left Column Details -->
+      <main>
+        <div class="glass-panel" style="padding: 40px; margin-bottom: 30px;">
+          <h2 style="font-size: 22px; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">About the Event</h2>
+          <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 30px; white-space: pre-line;" id="details-description"></p>
+          
+          <h2 style="font-size: 22px; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">Highlight Information</h2>
+          <div class="highlight-badge-grid" id="highlights-container">
+            <!-- Highlights will load here -->
+          </div>
+
+          <h2 style="font-size: 22px; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; display: none;" id="gallery-title">Gallery</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px;" id="gallery-container">
+            <!-- Gallery images -->
+          </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="glass-panel" style="padding: 40px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 16px; margin-bottom: 20px;">
+            <h2 style="font-size: 22px;">Attendee Reviews</h2>
+            <button class="btn btn-outline btn-sm" id="write-review-btn" onclick="openReviewModal()">Write a Review</button>
+          </div>
+
+          <div id="reviews-list-block">
+            <!-- Dynamic list of user reviews -->
+            <p style="text-align: center; color: var(--text-secondary); padding: 20px;">No reviews left yet for this event.</p>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Column Ticket Widget -->
+      <aside>
+        <div class="ticket-sticky-card glass-panel">
+          <div class="ticket-sticky-info">
+            <div class="ticket-sticky-info-item">
+              <i class="fas fa-ticket-alt"></i>
+              <div>
+                <p style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase;">Ticket Price</p>
+                <h3 style="font-size: 24px; color: var(--accent-pink);" id="sticky-price-lbl">Free Entry</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="ticket-sticky-info">
+            <div class="ticket-sticky-info-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <div>
+                <p style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase;">Venue / Location</p>
+                <p style="font-size: 14px; font-weight: 500;" id="sticky-location-lbl">Dhaka, Bangladesh</p>
+              </div>
+            </div>
+            <div class="ticket-sticky-info-item" style="margin-top: 16px;">
+              <i class="fas fa-chair"></i>
+              <div>
+                <p style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase;">Seat Capacity</p>
+                <p style="font-size: 14px; font-weight: 500;" id="sticky-seats-lbl">0 Available</p>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%;" id="book-seats-trigger" onclick="openBookingModal()">Book Pass</button>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- BOOKING SEAT PASS MODAL -->
+  <div class="modal" id="booking-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Book Seat Pass</h3>
+          <button class="close-btn" onclick="UI.closeModal('booking-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <p style="font-size: 14px; color: var(--text-secondary);">Select the number of seat passes you would like to book.</p>
+            
+            <div class="seat-counter">
+              <button class="counter-btn" onclick="updateSeatCount(-1)">-</button>
+              <span style="font-size: 32px; font-weight: 800; width: 60px;" id="book-seats-count">1</span>
+              <button class="counter-btn" onclick="updateSeatCount(1)">+</button>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);" id="modal-avail-seats">Available seats: 0</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Payment Method</label>
+            <select id="book-payment-method" class="form-control form-select">
+              <option value="CARD">Debit / Credit Card</option>
+              <option value="MOBILE_BANKING">Mobile Financial Services (bKash/Nagad)</option>
+              <option value="CASH_ON_GATE">Cash Payment on Entry Gate</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="book-notes">Special Requirements / Notes</label>
+            <textarea id="book-notes" class="form-control" placeholder="Food requirements, wheelchair support, general requirements..." rows="3"></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 16px; border-radius: var(--border-radius-sm); margin-top: 24px;">
+            <span style="font-weight: 600; font-size: 15px;">Total Amount:</span>
+            <span style="font-weight: 800; font-size: 22px; color: var(--accent-pink);" id="book-total-price">0 BDT</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="UI.closeModal('booking-modal')">Cancel</button>
+          <button class="btn btn-primary" onclick="confirmTicketBooking()">Confirm Booking</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WRITE REVIEW MODAL -->
+  <div class="modal" id="review-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Write Attendee Review</h3>
+          <button class="close-btn" onclick="UI.closeModal('review-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Your Rating</label>
+            <div class="stars-rating-picker" id="stars-picker">
+              <i class="fas fa-star active" data-val="1"></i>
+              <i class="fas fa-star" data-val="2"></i>
+              <i class="fas fa-star" data-val="3"></i>
+              <i class="fas fa-star" data-val="4"></i>
+              <i class="fas fa-star" data-val="5"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="review-comment">Review Comment</label>
+            <textarea id="review-comment" class="form-control" placeholder="Share your experience attending this event..." rows="4" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="UI.closeModal('review-modal')">Cancel</button>
+          <button class="btn btn-primary" onclick="submitAttendeeReview()">Submit Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic Footer Navigation -->
+  <footer id="footer-nav"></footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    let eventId = '';
+    let ticketPrice = 0;
+    let availableSeats = 0;
+    let selectedSeatsCount = 1;
+    let selectedRating = 1;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      eventId = params.get('id');
+
+      if (!eventId) {
+        window.location.href = 'events.html';
+        return;
+      }
+
+      loadEventDetails();
+      loadEventReviews();
+
+      // Initialize Star Rating picker events
+      const stars = document.querySelectorAll('#stars-picker i');
+      stars.forEach((star, idx) => {
+        star.addEventListener('click', () => {
+          selectedRating = idx + 1;
+          stars.forEach((s, sIdx) => {
+            if (sIdx <= idx) {
+              s.classList.add('active');
+            } else {
+              s.classList.remove('active');
+            }
+          });
+        });
+      });
+    });
+
+    // Fetch Details from Server
+    async function loadEventDetails() {
+      UI.showLoader();
+      const res = await API.get(CONFIG.ENDPOINTS.EVENTS.GET_ONE(eventId));
+      UI.hideLoader();
+
+      if (res.success && res.data) {
+        const evt = res.data;
+        ticketPrice = evt.ticketPrice;
+        availableSeats = evt.availableSeats;
+
+        // Banner and header
+        const banner = evt.bannerUrl || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1000';
+        document.getElementById('details-hero-bg').src = banner;
+        document.getElementById('details-category-badge').textContent = evt.category?.name || 'General';
+        document.getElementById('details-title').textContent = evt.title;
+        document.getElementById('details-date-lbl').textContent = UI.formatDate(evt.date);
+        document.getElementById('details-time-lbl').textContent = evt.time;
+
+        // Sticky info card details
+        document.getElementById('sticky-price-lbl').textContent = evt.ticketPrice > 0 ? UI.formatCurrency(evt.ticketPrice) : 'Free Entry';
+        document.getElementById('sticky-location-lbl').textContent = evt.location;
+        document.getElementById('sticky-seats-lbl').textContent = `${evt.availableSeats} of ${evt.seatCount} seats available`;
+
+        // Description
+        document.getElementById('details-description').textContent = evt.description || evt.about || 'No details provided.';
+
+        // Highlights render
+        const highlightContainer = document.getElementById('highlights-container');
+        highlightContainer.innerHTML = '';
+
+        const highlights = evt.eventHighlight || {};
+        const items = [
+          { key: 'dressCode', label: 'Dress Code', defaultVal: 'Casual', icon: 'tshirt' },
+          { key: 'workshops', label: 'Workshops', defaultVal: '0 Sessions', icon: 'chalkboard-teacher' },
+          { key: 'wifiAvailable', label: 'WiFi Status', defaultVal: 'Available', icon: 'wifi' },
+          { key: 'parkingFacility', label: 'Parking Space', defaultVal: 'Available', icon: 'car' }
+        ];
+
+        items.forEach(item => {
+          let val = highlights[item.key];
+          if (val === true) val = 'Yes';
+          if (val === false) val = 'No';
+          if (val === undefined || val === null) val = item.defaultVal;
+
+          const hDiv = document.createElement('div');
+          hDiv.className = 'highlight-badge-item';
+          hDiv.innerHTML = `
+            <i class="fas fa-${item.icon}"></i>
+            <div>
+              <p style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">${item.label}</p>
+              <p style="font-size: 14px; font-weight: 600;">${val}</p>
+            </div>
+          `;
+          highlightContainer.appendChild(hDiv);
+        });
+
+        // Countdown timer initialization
+        initCountdownTimer(evt.date);
+
+        // Seating availability action buttons
+        if (evt.availableSeats <= 0 || evt.status === 'COMPLETED' || evt.status === 'CANCELLED') {
+          const btn = document.getElementById('book-seats-trigger');
+          btn.disabled = true;
+          btn.textContent = evt.availableSeats <= 0 ? 'Fully Booked' : `Event ${evt.status}`;
+          btn.className = 'btn btn-secondary';
+        }
+      } else {
+        UI.toast(res.message || 'Failed to load event details.', 'error');
+      }
+    }
+
+    // Set countdown clock
+    function initCountdownTimer(eventDateStr) {
+      const target = new Date(eventDateStr).getTime();
+      const block = document.getElementById('countdown-block');
+
+      const updateClock = () => {
+        const now = new Date().getTime();
+        const diff = target - now;
+
+        if (diff <= 0) {
+          block.style.display = 'none';
+          return;
+        }
+
+        block.style.display = 'flex';
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('time-days').textContent = d.toString().padStart(2, '0');
+        document.getElementById('time-hours').textContent = h.toString().padStart(2, '0');
+        document.getElementById('time-minutes').textContent = m.toString().padStart(2, '0');
+        document.getElementById('time-seconds').textContent = s.toString().padStart(2, '0');
+      };
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
+
+    // Load user reviews for the event
+    async function loadEventReviews() {
+      const container = document.getElementById('reviews-list-block');
+      const res = await API.get(CONFIG.ENDPOINTS.REVIEWS.GET_EVENT_REVIEWS(eventId));
+
+      if (res.success && Array.isArray(res.data)) {
+        if (res.data.length === 0) {
+          container.innerHTML = `<p style="text-align: center; color: var(--text-secondary); padding: 20px;">No reviews left yet for this event.</p>`;
+          return;
+        }
+
+        container.innerHTML = '';
+        res.data.forEach(rev => {
+          const rDiv = document.createElement('div');
+          rDiv.className = 'review-item';
+
+          let starsHtml = '';
+          for (let i = 1; i <= 5; i++) {
+            starsHtml += `<i class="fa${i <= rev.rating ? 's' : 'r'} fa-star" style="color: var(--warning); font-size: 13px;"></i> `;
+          }
+
+          rDiv.innerHTML = `
+            <div class="review-header">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <strong style="font-size: 15px;">${UI.escapeHTML(rev.user?.name || 'Attendee')}</strong>
+                <span style="font-size: 12px; color: var(--text-muted);">${UI.formatDate(rev.createdAt)}</span>
+              </div>
+              <div>${starsHtml}</div>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 14px;">${UI.escapeHTML(rev.comment || '')}</p>
+          `;
+          container.appendChild(rDiv);
+        });
+      }
+    }
+
+    // Modal Triggers
+    function openBookingModal() {
+      if (!AUTH.isLoggedIn()) {
+        window.location.href = `login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+        return;
+      }
+
+      document.getElementById('book-seats-count').textContent = selectedSeatsCount;
+      document.getElementById('modal-avail-seats').textContent = `Available seats: ${availableSeats}`;
+      updateBookingModalPrice();
+      UI.openModal('booking-modal');
+    }
+
+    function openReviewModal() {
+      if (!AUTH.isLoggedIn()) {
+        window.location.href = `login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+        return;
+      }
+      UI.openModal('review-modal');
+    }
+
+    // Seat count modifier
+    function updateSeatCount(val) {
+      const newVal = selectedSeatsCount + val;
+      if (newVal < 1 || newVal > availableSeats) return;
+
+      selectedSeatsCount = newVal;
+      document.getElementById('book-seats-count').textContent = selectedSeatsCount;
+      updateBookingModalPrice();
+    }
+
+    // Recalculate price
+    function updateBookingModalPrice() {
+      const total = selectedSeatsCount * ticketPrice;
+      document.getElementById('book-total-price').textContent = total > 0 ? `${UI.formatCurrency(total)} BDT` : 'Free Entry';
+    }
+
+    // Dispatch Ticket Booking to API
+    async function confirmTicketBooking() {
+      UI.showLoader();
+      const method = document.getElementById('book-payment-method').value;
+      const notes = document.getElementById('book-notes').value.trim();
+
+      const payload = {
+        eventId,
+        seatCount: selectedSeatsCount,
+        paymentMethod: method,
+        notes: notes || undefined
+      };
+
+      const res = await API.post(CONFIG.ENDPOINTS.BOOKINGS.BOOK, payload);
+      UI.hideLoader();
+
+      if (res.success && res.data) {
+        UI.closeModal('booking-modal');
+        UI.toast('Ticket booked successfully!', 'success');
+        setTimeout(() => {
+          window.location.href = `ticket.html?id=${res.data.id}`;
+        }, 1500);
+      } else {
+        UI.toast(res.message || 'Booking ticket failed.', 'error');
+      }
+    }
+
+    // Review Submission
+    async function submitAttendeeReview() {
+      const comment = document.getElementById('review-comment').value.trim();
+      if (!comment) {
+        UI.toast('Please write a review comment.', 'warning');
+        return;
+      }
+
+      UI.showLoader();
+      const res = await API.post(CONFIG.ENDPOINTS.REVIEWS.CREATE, {
+        eventId,
+        rating: selectedRating,
+        comment
+      });
+      UI.hideLoader();
+
+      if (res.success) {
+        UI.closeModal('review-modal');
+        UI.toast('Thank you! Review submitted successfully.', 'success');
+        document.getElementById('review-comment').value = '';
+        loadEventReviews();
+      } else {
+        UI.toast(res.message || 'Failed to submit review. Have you attended/booked this event?', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

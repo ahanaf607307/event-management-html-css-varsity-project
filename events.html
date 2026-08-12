@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore Events | Eventify</title>
+  
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/toast.css">
+  
+  <style>
+    .catalog-wrapper {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 40px;
+      padding: 60px 0;
+    }
+
+    /* Filter Sidebar */
+    .filter-sidebar {
+      padding: 30px 24px;
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+    }
+
+    .filter-section {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .filter-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .filter-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Price range styling */
+    .price-slider-container {
+      margin-top: 10px;
+    }
+    .price-values {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    /* Pagination controls */
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 50px;
+    }
+    
+    .page-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius-sm);
+      color: var(--text-secondary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .page-btn:hover, .page-btn.active {
+      background: var(--accent-primary);
+      color: #fff;
+      border-color: var(--accent-primary);
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+    }
+    
+    .page-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 900px) {
+      .catalog-wrapper {
+        grid-template-columns: 1fr;
+      }
+      .filter-sidebar {
+        position: relative;
+        top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dynamic Header Navigation -->
+  <header id="header-nav"></header>
+
+  <div class="container">
+    <div class="catalog-wrapper">
+      
+      <!-- Left Filters Sidebar -->
+      <aside class="filter-sidebar glass-panel">
+        <div class="filter-section">
+          <div class="filter-title">
+            <span>Search Keyword</span>
+            <i class="fas fa-search" style="font-size: 13px; color: var(--text-muted);"></i>
+          </div>
+          <input type="text" id="filter-search" class="form-control" placeholder="Title, location, venue...">
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-title">Event Category</div>
+          <select id="filter-category" class="form-control form-select">
+            <option value="">All Categories</option>
+            <!-- Render options dynamically -->
+          </select>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-title">Ticket Price Max</div>
+          <div class="price-slider-container">
+            <input type="range" id="filter-price-slider" class="form-control" min="0" max="10000" step="250" value="10000" style="padding: 0; height: 6px; cursor: pointer;">
+            <div class="price-values">
+              <span>0 BDT</span>
+              <span id="price-slider-lbl" style="font-weight: 700; color: var(--accent-pink);">10,000 BDT</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-title">Event Date</div>
+          <input type="date" id="filter-date" class="form-control">
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-title">Event Status</div>
+          <select id="filter-status" class="form-control form-select">
+            <option value="">All Statuses</option>
+            <option value="UPCOMING">Upcoming</option>
+            <option value="ONGOING">Ongoing</option>
+            <option value="COMPLETED">Completed</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" style="width: 100%;" onclick="applyFilters()">Apply Filters</button>
+        <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="resetFilters()">Reset</button>
+      </aside>
+
+      <!-- Right Events Grid Area -->
+      <main>
+        <!-- Catalog Header -->
+        <div class="table-controls" style="margin-bottom: 30px;">
+          <div>
+            <h2 style="font-size: 24px; margin-bottom: 4px;">Explore Events</h2>
+            <p style="color: var(--text-secondary); font-size: 14px;" id="results-count-lbl">Loading events...</p>
+          </div>
+
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <span style="font-size: 14px; color: var(--text-secondary); white-space: nowrap;">Sort By:</span>
+            <select id="sort-selector" class="form-control form-select" style="width: 180px; padding: 8px 16px; font-size: 14px;" onchange="applyFilters()">
+              <option value="date-asc">Date (Upcoming First)</option>
+              <option value="date-desc">Date (Newest Created)</option>
+              <option value="price-asc">Price (Low to High)</option>
+              <option value="price-desc">Price (High to Low)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Grid Container -->
+        <div class="event-grid" id="catalog-events-grid">
+          <!-- Render catalog event cards here -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-container" id="pagination-controls">
+          <!-- Render page buttons dynamically -->
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Dynamic Footer Navigation -->
+  <footer id="footer-nav"></footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    let currentPage = 1;
+    const limit = 6;
+    let selectedCategory = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Initialize Price Range Slider Label update
+      const slider = document.getElementById('filter-price-slider');
+      const label = document.getElementById('price-slider-lbl');
+      slider.addEventListener('input', () => {
+        label.textContent = slider.value === '10000' ? '10,000 BDT' : `${UI.formatCurrency(slider.value)}`;
+      });
+
+      // 2. Fetch and render categories inside dropdown selector
+      loadCategoryDropdown();
+
+      // 3. Look for initial URL parameters (like search terms or category)
+      handleUrlParams();
+
+      // 4. Load initial events data
+      fetchCatalogEvents();
+    });
+
+    // Check URL parameters on page load to prefill filters
+    function handleUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const search = params.get('search');
+      const category = params.get('category');
+
+      if (search) {
+        document.getElementById('filter-search').value = search;
+      }
+      if (category) {
+        selectedCategory = category; // Set global and we will bind once categories are loaded
+      }
+    }
+
+    // Load event categories
+    async function loadCategoryDropdown() {
+      const dropdown = document.getElementById('filter-category');
+      const res = await API.get(CONFIG.ENDPOINTS.CATEGORIES.LIST);
+      
+      if (res.success && Array.isArray(res.data)) {
+        res.data.forEach(cat => {
+          if (!cat.isActive) return;
+          const opt = document.createElement('option');
+          opt.value = cat.id;
+          opt.textContent = cat.name;
+          
+          // Set selection if matches category slug in parameters
+          if (cat.slug === selectedCategory) {
+            opt.selected = true;
+          }
+          dropdown.appendChild(opt);
+        });
+      }
+    }
+
+    // Refresh events catalog when clicking apply filters
+    function applyFilters() {
+      currentPage = 1;
+      fetchCatalogEvents();
+    }
+
+    // Reset filters sidebar
+    function resetFilters() {
+      document.getElementById('filter-search').value = '';
+      document.getElementById('filter-category').value = '';
+      document.getElementById('filter-price-slider').value = '10000';
+      document.getElementById('price-slider-lbl').textContent = '10,000 BDT';
+      document.getElementById('filter-date').value = '';
+      document.getElementById('filter-status').value = '';
+      document.getElementById('sort-selector').value = 'date-asc';
+      currentPage = 1;
+      fetchCatalogEvents();
+    }
+
+    // Main fetch catalog controller
+    async function fetchCatalogEvents() {
+      const grid = document.getElementById('catalog-events-grid');
+      UI.renderSkeleton('#catalog-events-grid', limit, 'card');
+      document.getElementById('pagination-controls').innerHTML = '';
+
+      // Extrapolate query filters
+      const search = document.getElementById('filter-search').value.trim();
+      const categoryId = document.getElementById('filter-category').value;
+      const price = document.getElementById('filter-price-slider').value;
+      const date = document.getElementById('filter-date').value;
+      const status = document.getElementById('filter-status').value;
+      const sortBy = document.getElementById('sort-selector').value;
+
+      // Map Sort param to API query builder format
+      let sortParam = 'date';
+      if (sortBy === 'date-desc') {
+        sortParam = '-createdAt';
+      } else if (sortBy === 'price-asc') {
+        sortParam = 'ticketPrice';
+      } else if (sortBy === 'price-desc') {
+        sortParam = '-ticketPrice';
+      }
+
+      const params = {
+        page: currentPage,
+        limit: limit,
+        searchTerm: search || undefined,
+        categoryId: categoryId || undefined,
+        status: status || undefined,
+        sort: sortParam
+      };
+
+      // Handle custom maximum price range
+      if (price !== '10000') {
+        params.maxPrice = price;
+      }
+      if (date) {
+        params.date = new Date(date).toISOString();
+      }
+
+      const res = await API.get(CONFIG.ENDPOINTS.EVENTS.LIST, params);
+
+      if (res.success && Array.isArray(res.data)) {
+        document.getElementById('results-count-lbl').textContent = `Showing ${res.data.length} events of ${res.meta?.total || res.data.length} found`;
+
+        if (res.data.length === 0) {
+          grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--text-secondary);">
+            <i class="fas fa-search" style="font-size: 40px; color: var(--text-muted); margin-bottom: 20px;"></i>
+            <h3>No events found</h3>
+            <p style="margin-top: 10px;">Try adjusting filters or changing search keywords.</p>
+          </div>`;
+          return;
+        }
+
+        grid.innerHTML = '';
+        res.data.forEach(evt => {
+          if (!evt.isActive) return;
+          const card = document.createElement('div');
+          card.className = 'event-card glass-panel';
+
+          const banner = evt.bannerUrl || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1000';
+          const badgeClass = evt.status === 'UPCOMING' ? 'badge-upcoming' : (evt.status === 'ONGOING' ? 'badge-ongoing' : 'badge-completed');
+
+          card.innerHTML = `
+            <div class="event-card-img-wrapper">
+              <img class="event-card-img" src="${banner}" alt="${UI.escapeHTML(evt.title)}" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1000'">
+              <span class="badge ${badgeClass} event-card-badge">${evt.status}</span>
+            </div>
+            <div class="event-card-body">
+              <div class="event-card-category">${UI.escapeHTML(evt.category?.name || 'General')}</div>
+              <h3 class="event-card-title">${UI.escapeHTML(evt.title)}</h3>
+              <div class="event-card-meta">
+                <div class="event-card-metaItem"><i class="fas fa-calendar-alt"></i> ${UI.formatDate(evt.date)}</div>
+                <div class="event-card-metaItem"><i class="fas fa-clock"></i> ${UI.escapeHTML(evt.time)}</div>
+                <div class="event-card-metaItem"><i class="fas fa-map-marker-alt"></i> ${UI.escapeHTML(evt.location.split(',')[0])}</div>
+              </div>
+              <div class="event-card-footer">
+                <div class="event-card-price">${evt.ticketPrice > 0 ? UI.formatCurrency(evt.ticketPrice) : 'Free Entry'}</div>
+                <a href="event-details.html?id=${evt.id}" class="btn btn-primary btn-sm">Book Pass</a>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        // 5. Generate pagination buttons
+        if (res.meta && res.meta.totalPages > 1) {
+          renderPagination(res.meta);
+        }
+      } else {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--danger);">${res.message || 'Failed to fetch catalog events.'}</div>`;
+      }
+    }
+
+    // Build pagination controls
+    function renderPagination(meta) {
+      const container = document.getElementById('pagination-controls');
+      container.innerHTML = '';
+
+      // Prev Button
+      const prev = document.createElement('button');
+      prev.className = `page-btn ${meta.page === 1 ? 'disabled' : ''}`;
+      prev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+      prev.disabled = meta.page === 1;
+      prev.onclick = () => {
+        currentPage = meta.page - 1;
+        fetchCatalogEvents();
+      };
+      container.appendChild(prev);
+
+      // Page Numbers
+      for (let i = 1; i <= meta.totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = `page-btn ${meta.page === i ? 'active' : ''}`;
+        btn.textContent = i;
+        btn.onclick = () => {
+          currentPage = i;
+          fetchCatalogEvents();
+        };
+        container.appendChild(btn);
+      }
+
+      // Next Button
+      const next = document.createElement('button');
+      next.className = `page-btn ${meta.page === meta.totalPages ? 'disabled' : ''}`;
+      next.innerHTML = '<i class="fas fa-chevron-right"></i>';
+      next.disabled = meta.page === meta.totalPages;
+      next.onclick = () => {
+        currentPage = meta.page + 1;
+        fetchCatalogEvents();
+      };
+      container.appendChild(next);
+    }
+  </script>
+</body>
+</html>

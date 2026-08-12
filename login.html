@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In / Register | Eventify</title>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/toast.css">
+  <style>
+    .auth-page-wrapper {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+    }
+    
+    .auth-banner-side {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.95) 100%), url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070') center/cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px;
+      position: relative;
+      border-right: 1px solid var(--glass-border);
+    }
+
+    .auth-banner-side::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .auth-banner-content {
+      position: relative;
+      z-index: 10;
+    }
+
+    .auth-banner-content h1 {
+      font-size: 42px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 0%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .auth-banner-content p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-bottom: 40px;
+      max-width: 480px;
+    }
+
+    .auth-form-side {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 460px;
+      padding: 40px;
+    }
+
+    .tabs-header {
+      display: flex;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 30px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 0;
+      text-align: center;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+    }
+
+    .auth-section {
+      display: none;
+    }
+    
+    .auth-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .social-login-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius-sm);
+      color: var(--text-primary);
+      font-family: var(--font-heading);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      margin-bottom: 24px;
+      transition: var(--transition);
+    }
+    .social-login-btn:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--text-muted);
+    }
+
+    .divider-text {
+      text-align: center;
+      position: relative;
+      margin-bottom: 24px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .divider-text::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 50%; width: 42%; height: 1px;
+      background: var(--glass-border);
+    }
+    .divider-text::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 50%; width: 42%; height: 1px;
+      background: var(--glass-border);
+    }
+
+    /* Demo Quick Credentials */
+    .demo-accounts {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed var(--glass-border);
+      border-radius: var(--border-radius-sm);
+    }
+
+    .demo-accounts h4 {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .demo-btn {
+      padding: 8px 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: left;
+    }
+    .demo-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border-color: var(--accent-primary);
+    }
+
+    /* OTP Code Verify Block */
+    .otp-input-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .otp-cell {
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 900px) {
+      .auth-page-wrapper {
+        grid-template-columns: 1fr;
+      }
+      .auth-banner-side {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-page-wrapper">
+    <!-- Left Banner -->
+    <div class="auth-banner-side">
+      <div class="auth-banner-content">
+        <a href="index.html" class="logo" style="margin-bottom: 60px;">
+          <i class="fas fa-rocket"></i> Eventify
+        </a>
+        <h1>Unlock Global Experiences</h1>
+        <p>Book tickets to high-tech code camps, live stadiums, deep-dive business conferences, and exclusive masterclasses all over the world.</p>
+        
+        <div class="glass-panel" style="padding: 24px; max-width: 420px; border-color: rgba(255,255,255,0.05);">
+          <p style="font-style: italic; color: #fff; font-size: 14px; margin-bottom: 12px;">"Booking was lightning fast, and checking in with the digital QR ticket at the venue took under 5 seconds! Simply amazing."</p>
+          <span style="font-weight: 700; font-size: 13px;">— Ahanaf Habib, Lead Developer</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Form Panel -->
+    <div class="auth-form-side">
+      <div class="auth-card glass-panel" id="auth-card-block">
+        
+        <!-- Tabs Header -->
+        <div class="tabs-header">
+          <div class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</div>
+          <div class="tab-btn" id="tab-register" onclick="switchTab('register')">Register</div>
+        </div>
+
+        <!-- LOGIN PANEL -->
+        <div class="auth-section active" id="section-login">
+          <button class="social-login-btn" id="google-login-trigger">
+            <i class="fab fa-google" style="color: #ea4335;"></i> Continue with Google
+          </button>
+
+          <div class="divider-text">or sign in with email</div>
+
+          <form id="login-form">
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email Address</label>
+              <input type="email" id="login-email" class="form-control" placeholder="name@domain.com" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <label class="form-label" for="login-password" style="margin-bottom: 0;">Password</label>
+                <a href="forgot-password.html" style="font-size: 13px;">Forgot Password?</a>
+              </div>
+              <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Sign In</button>
+          </form>
+
+          <!-- Quick Test Accounts -->
+          <div class="demo-accounts">
+            <h4>⚡ Quick Test Accounts (Demo)</h4>
+            <div class="demo-grid">
+              <button class="demo-btn" onclick="fillCreds('system@test.com', '123456')">
+                <strong>System Owner</strong><br>system@test.com
+              </button>
+              <button class="demo-btn" onclick="fillCreds('user1@test.com', '123456')">
+                <strong>User / Attendee</strong><br>user1@test.com
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- REGISTER PANEL -->
+        <div class="auth-section" id="section-register">
+          <form id="register-form">
+            <div class="form-group">
+              <label class="form-label" for="reg-name">Full Name</label>
+              <input type="text" id="reg-name" class="form-control" placeholder="John Doe" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-email">Email Address</label>
+              <input type="email" id="reg-email" class="form-control" placeholder="name@domain.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-password">Password</label>
+              <input type="password" id="reg-password" class="form-control" placeholder="At least 6 characters" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-avatar">Profile Picture (Optional)</label>
+              <input type="file" id="reg-avatar" class="form-control" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Register Account</button>
+          </form>
+        </div>
+
+        <!-- OTP VERIFICATION SCREEN -->
+        <div class="auth-section" id="section-otp">
+          <h3 style="margin-bottom: 10px; font-size: 22px;">Verify Email</h3>
+          <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">An OTP (One Time Password) has been sent to your email <strong id="otp-email-lbl"></strong>. Enter the OTP code below to verify.</p>
+          
+          <form id="otp-form">
+            <div class="form-group">
+              <label class="form-label" for="otp-code">Enter 6-Digit OTP</label>
+              <input type="text" id="otp-code" class="form-control" placeholder="123456" maxlength="6" style="text-align: center; font-size: 20px; letter-spacing: 5px; font-weight: 700;" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Verify & Activate</button>
+            <div style="text-align: center; margin-top: 20px;">
+              <button type="button" class="btn btn-secondary btn-sm" id="resend-otp-btn">Resend OTP</button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    // Tab switching (Login vs Register)
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.auth-section').forEach(sec => sec.classList.remove('active'));
+
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      document.getElementById(`section-${tab}`).classList.add('active');
+    }
+
+    // Fill demo account credentials quickly
+    function fillCreds(email, password) {
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').value = password;
+      UI.toast(`Filled demo credentials for ${email}`, 'info');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check query string parameters to switch tabs or handle messages
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('tab') === 'register') {
+        switchTab('register');
+      }
+
+      // Check Google Redirect Callbacks
+      AUTH.handleGoogleCallback();
+
+      // Sign In Form submission
+      const loginForm = document.getElementById('login-form');
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        UI.showLoader();
+
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        const res = await AUTH.login(email, password);
+        UI.hideLoader();
+
+        if (res.success) {
+          UI.toast('Login successful! Redirecting...', 'success');
+          setTimeout(() => {
+            const redirect = params.get('redirect');
+            window.location.href = redirect ? decodeURIComponent(redirect) : 'dashboard.html';
+          }, 1000);
+        } else {
+          // If error is related to unverified user, we can send OTP and switch to OTP verify screen!
+          if (res.message && res.message.toLowerCase().includes('verify your email')) {
+            UI.toast('Account not verified. Sending OTP to your email...', 'warning');
+            sendVerificationFlow(email);
+          } else {
+            UI.toast(res.message || 'Login failed. Please check credentials.', 'error');
+          }
+        }
+      });
+
+      // Register Form submission
+      const registerForm = document.getElementById('register-form');
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        UI.showLoader();
+
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const avatar = document.getElementById('reg-avatar').files[0];
+
+        const res = await AUTH.register(name, email, password, avatar);
+        UI.hideLoader();
+
+        if (res.success) {
+          UI.toast('Account registered! Verification OTP has been sent to your email.', 'success');
+          // Switch to OTP verify flow
+          startOtpVerifyFlow(email);
+        } else {
+          UI.toast(res.message || 'Registration failed.', 'error');
+        }
+      });
+
+      // Google Login Button trigger
+      document.getElementById('google-login-trigger').addEventListener('click', () => {
+        AUTH.triggerGoogleLogin();
+      });
+
+      // Email Activation Verification Flow
+      let currentVerifyEmail = '';
+
+      function startOtpVerifyFlow(email) {
+        currentVerifyEmail = email;
+        document.getElementById('otp-email-lbl').textContent = email;
+        
+        // Hide tabs & show OTP panel
+        document.querySelector('.tabs-header').style.display = 'none';
+        document.querySelectorAll('.auth-section').forEach(sec => sec.classList.remove('active'));
+        document.getElementById('section-otp').classList.add('active');
+      }
+
+      async function sendVerificationFlow(email) {
+        UI.showLoader();
+        const res = await AUTH.sendOtp(email);
+        UI.hideLoader();
+        if (res.success) {
+          startOtpVerifyFlow(email);
+        } else {
+          UI.toast('Failed to dispatch OTP verification code. Try again later.', 'error');
+        }
+      }
+
+      // OTP Verification Submission
+      const otpForm = document.getElementById('otp-form');
+      otpForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        UI.showLoader();
+
+        const code = document.getElementById('otp-code').value;
+        const res = await AUTH.verifyOtp(currentVerifyEmail, code);
+        UI.hideLoader();
+
+        if (res.success) {
+          UI.toast('Account successfully verified! Please login with your password.', 'success');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1500);
+        } else {
+          UI.toast(res.message || 'Invalid or expired OTP. Please try again.', 'error');
+        }
+      });
+
+      // Resend OTP trigger
+      document.getElementById('resend-otp-btn').addEventListener('click', async () => {
+        UI.showLoader();
+        const res = await AUTH.sendOtp(currentVerifyEmail);
+        UI.hideLoader();
+        if (res.success) {
+          UI.toast('OTP resent successfully!', 'success');
+        } else {
+          UI.toast(res.message || 'Failed to resend OTP.', 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
