@@ -2,7 +2,7 @@
  * Eventify - Central Configuration & Constants
  */
 const CONFIG = {
-  API_BASE_URL: 'http://localhost:8000/api/v1',
+  API_BASE_URL: 'https://eventify-backend-roan.vercel.app/api/v1',
   AUTH_STORAGE_KEY: 'eventify_auth_token',
   USER_STORAGE_KEY: 'eventify_user_data',
   THEME_STORAGE_KEY: 'eventify_theme',
