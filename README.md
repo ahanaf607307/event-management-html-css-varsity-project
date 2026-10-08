@@ -2,7 +2,7 @@
 
 Eventify is a premium, production-grade event booking and ticketing application built with **HTML5, CSS3, and Vanilla JavaScript (ES6 Modules)**. It integrates seamlessly with a Node.js/PostgreSQL backend API, utilizing modern glassmorphism design principles, responsive structures, and advanced features like live QR ticket generation, real-time metrics, staff QR code check-in scanner, and comprehensive analytics.
 
----
+------
 
 ## 🚀 Features
 
