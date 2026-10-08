@@ -45,7 +45,7 @@ Dynamically alters sidebar links and panels based on logged-in user permissions:
 
 ---
 
-## 📦 Run Locally
+## 📦 Run Locally    
 
 1. **Clone the repository**:
    ```bash
@@ -57,7 +57,7 @@ Dynamically alters sidebar links and panels based on logged-in user permissions:
    Host the directory using a local static HTTP server:
    - Node: `npx http-server -p 3000 -c-1`
    - Python: `python -m http.server 3000`
-   - VS Code: Open `index.html` and launch the `Live Server` extension.
+   - VS Code: Open `index.html` and launch the `Live Server` extension..
 
 3. **Browse application**:
    Open **[http://localhost:3000](http://localhost:3000)** in your browser.
