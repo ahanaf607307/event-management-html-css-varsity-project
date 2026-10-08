@@ -4,7 +4,7 @@ Eventify is a premium, production-grade event booking and ticketing application 
 
 ------
 
-## 🚀 Features
+## - 🚀 Features
 
 ### 1. Unified Authentication Flow
 - Tabbed Login & Registration views with optional avatar upload.
