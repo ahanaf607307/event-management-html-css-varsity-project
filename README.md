@@ -54,7 +54,7 @@ Dynamically alters sidebar links and panels based on logged-in user permissions:
    ```
 
 2. **Serve files**:
-   Host the directory using a local static HTTP server:
+   Host the directory using a local static HTTP server:-
    - Node: `npx http-server -p 3000 -c-1`
    - Python: `python -m http.server 3000`
    - VS Code: Open `index.html` and launch the `Live Server` extension..
