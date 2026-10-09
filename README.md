@@ -45,7 +45,7 @@ Dynamically alters sidebar links and panels based on logged-in user permissions:
 
 ---
 
-## 📦 Run Locally    
+## 📦 Run Locally  -  
 
 1. **Clone the repository**:
    ```bash
